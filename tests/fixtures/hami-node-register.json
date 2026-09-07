@@ -1,0 +1,11 @@
+[
+  {
+    "id": "GPU-abc",
+    "count": 10,
+    "devmem": 131072,
+    "devcore": 100,
+    "type": "NVIDIA GB10",
+    "mode": "hami-core",
+    "health": true
+  }
+]
