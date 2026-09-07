@@ -1,0 +1,39 @@
+name: Sync docs to Wiki
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/sync-wiki.sh"
+      - ".github/workflows/wiki-sync.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wiki-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clone Wiki
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          git clone \
+            "https://x-access-token:${WIKI_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" \
+            "$RUNNER_TEMP/queue-aware-vgpu-wiki"
+
+      - name: Sync short docs pages
+        run: |
+          bash scripts/check-docs.sh
+          bash scripts/sync-wiki.sh \
+            --wiki-dir "$RUNNER_TEMP/queue-aware-vgpu-wiki" \
+            --push

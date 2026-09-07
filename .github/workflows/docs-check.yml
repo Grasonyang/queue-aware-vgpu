@@ -1,0 +1,22 @@
+name: Docs check
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "scripts/check-docs.sh"
+      - ".github/workflows/docs-check.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/check-docs.sh"
+      - ".github/workflows/docs-check.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check short pages and diagrams
+        run: bash scripts/check-docs.sh
