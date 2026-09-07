@@ -1,0 +1,12 @@
+# K3s v1.35 generates a version-3 containerd configuration and imports this
+# directory. Keep the default runtime explicit so every Kubernetes workload
+# receives the NVIDIA container runtime when it requests GPU resources.
+[plugins.'io.containerd.cri.v1.runtime'.containerd]
+  default_runtime_name = "nvidia"
+
+[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.nvidia]
+  runtime_type = "io.containerd.runc.v2"
+
+[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.nvidia.options]
+  BinaryName = "/usr/bin/nvidia-container-runtime"
+  SystemdCgroup = false

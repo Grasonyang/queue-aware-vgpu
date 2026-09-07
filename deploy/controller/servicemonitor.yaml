@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: queue-aware-vgpu-controller
+  namespace: queue-aware-vgpu
+  labels:
+    app.kubernetes.io/name: queue-aware-vgpu-controller
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue-aware-vgpu-controller
+  namespaceSelector:
+    matchNames:
+      - queue-aware-vgpu
+  endpoints:
+    - port: metrics
+      interval: 15s
+      path: /metrics

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-aware-vgpu-controller
+  namespace: queue-aware-vgpu
+  labels:
+    app.kubernetes.io/name: queue-aware-vgpu-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue-aware-vgpu-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: queue-aware-vgpu-controller
+    spec:
+      serviceAccountName: queue-aware-vgpu-controller
+      containers:
+        - name: controller
+          image: queue-aware-vgpu/controller:dev
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CONFIG_PATH
+              value: /etc/queue-aware-vgpu/config.yaml
+            - name: RUST_LOG
+              value: info
+          ports:
+            - name: metrics
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /etc/queue-aware-vgpu
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: queue-aware-vgpu-controller

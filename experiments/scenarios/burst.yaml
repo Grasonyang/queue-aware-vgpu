@@ -1,0 +1,146 @@
+# GB10/HAMi reference capacity is 131072 MiB per physical device. These
+# requests are deliberately expressed in MiB and stay portable across the
+# ten logical HAMi replicas: small=6.25%, medium=12.5%, large=25%.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burst-small-1
+  namespace: research
+  annotations:
+    queue-aware-vgpu.io/queue: interactive
+  labels:
+    queue-aware-vgpu.io/scenario: burst
+spec:
+  schedulingGates:
+    - name: queue-aware-vgpu.io/admission
+  restartPolicy: Never
+  containers:
+    - name: workload
+      image: nvidia/cuda:13.2.0-base-ubuntu24.04
+      command: ["/bin/sh", "-c"]
+      args: ["nvidia-smi -L; sleep 45"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          nvidia.com/gpumem: "8192"
+          nvidia.com/gpucores: "10"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burst-large-1
+  namespace: research
+  annotations:
+    queue-aware-vgpu.io/queue: batch
+  labels:
+    queue-aware-vgpu.io/scenario: burst
+spec:
+  schedulingGates:
+    - name: queue-aware-vgpu.io/admission
+  restartPolicy: Never
+  containers:
+    - name: workload
+      image: nvidia/cuda:13.2.0-base-ubuntu24.04
+      command: ["/bin/sh", "-c"]
+      args: ["nvidia-smi -L; sleep 45"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          nvidia.com/gpumem: "32768"
+          nvidia.com/gpucores: "25"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burst-small-2
+  namespace: research
+  annotations:
+    queue-aware-vgpu.io/queue: interactive
+  labels:
+    queue-aware-vgpu.io/scenario: burst
+spec:
+  schedulingGates:
+    - name: queue-aware-vgpu.io/admission
+  restartPolicy: Never
+  containers:
+    - name: workload
+      image: nvidia/cuda:13.2.0-base-ubuntu24.04
+      command: ["/bin/sh", "-c"]
+      args: ["nvidia-smi -L; sleep 45"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          nvidia.com/gpumem: "8192"
+          nvidia.com/gpucores: "10"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burst-medium-1
+  namespace: research
+  annotations:
+    queue-aware-vgpu.io/queue: batch
+  labels:
+    queue-aware-vgpu.io/scenario: burst
+spec:
+  schedulingGates:
+    - name: queue-aware-vgpu.io/admission
+  restartPolicy: Never
+  containers:
+    - name: workload
+      image: nvidia/cuda:13.2.0-base-ubuntu24.04
+      command: ["/bin/sh", "-c"]
+      args: ["nvidia-smi -L; sleep 45"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          nvidia.com/gpumem: "16384"
+          nvidia.com/gpucores: "15"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burst-large-2
+  namespace: research
+  annotations:
+    queue-aware-vgpu.io/queue: batch
+  labels:
+    queue-aware-vgpu.io/scenario: burst
+spec:
+  schedulingGates:
+    - name: queue-aware-vgpu.io/admission
+  restartPolicy: Never
+  containers:
+    - name: workload
+      image: nvidia/cuda:13.2.0-base-ubuntu24.04
+      command: ["/bin/sh", "-c"]
+      args: ["nvidia-smi -L; sleep 45"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          nvidia.com/gpumem: "32768"
+          nvidia.com/gpucores: "25"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: burst-small-3
+  namespace: research
+  annotations:
+    queue-aware-vgpu.io/queue: interactive
+  labels:
+    queue-aware-vgpu.io/scenario: burst
+spec:
+  schedulingGates:
+    - name: queue-aware-vgpu.io/admission
+  restartPolicy: Never
+  containers:
+    - name: workload
+      image: nvidia/cuda:13.2.0-base-ubuntu24.04
+      command: ["/bin/sh", "-c"]
+      args: ["nvidia-smi -L; sleep 45"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+          nvidia.com/gpumem: "8192"
+          nvidia.com/gpucores: "10"

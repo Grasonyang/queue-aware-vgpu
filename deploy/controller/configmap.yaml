@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: queue-aware-vgpu-controller
+  namespace: queue-aware-vgpu
+data:
+  config.yaml: |
+    mode: queue
+    lookahead: 8
+    starvation_timeout_secs: 120
+    reconcile_interval_secs: 5
+    safety_margin_mib: 512
+    default_request_memory_mib: 4096
+    overcommit_step: 0.05
+    overcommit_cooldown_secs: 45
+    min_overcommit: 1.0
+    max_overcommit: 1.2
+    metrics_bind_address: 0.0.0.0:8080
+    prometheus_url: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090

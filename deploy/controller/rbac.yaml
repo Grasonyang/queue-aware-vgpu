@@ -1,0 +1,30 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: queue-aware-vgpu-controller
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["queue-aware-vgpu.io"]
+    resources: ["vgpuqueues"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: ["queue-aware-vgpu.io"]
+    resources: ["vgpuqueues/status"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: queue-aware-vgpu-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: queue-aware-vgpu-controller
+subjects:
+  - kind: ServiceAccount
+    name: queue-aware-vgpu-controller
+    namespace: queue-aware-vgpu

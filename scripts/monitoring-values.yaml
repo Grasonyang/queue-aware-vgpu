@@ -1,0 +1,51 @@
+# ============================================
+# Grafana
+# ============================================
+grafana:
+  enabled: false
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+
+# ============================================
+# Prometheus
+# ============================================
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+
+# ============================================
+# k3s / k3d compatibility
+#
+# k3s embeds these control-plane components,
+# unlike kubeadm they are not necessarily
+# exposed as standalone metrics endpoints.
+# ============================================
+kubeEtcd:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeProxy:
+  enabled: false

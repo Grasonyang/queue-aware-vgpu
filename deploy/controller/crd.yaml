@@ -1,0 +1,117 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: vgpuqueues.queue-aware-vgpu.io
+spec:
+  group: queue-aware-vgpu.io
+  names:
+    kind: VGPUQueue
+    plural: vgpuqueues
+    singular: vgpuqueue
+    shortNames:
+      - vgpuq
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Pending
+          type: integer
+          jsonPath: .status.pendingJobs
+        - name: Running
+          type: integer
+          jsonPath: .status.runningJobs
+        - name: Weight
+          type: integer
+          jsonPath: .spec.weight
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              properties:
+                weight:
+                  type: integer
+                  format: uint32
+                  minimum: 0
+                  default: 1
+                maxRunning:
+                  type: integer
+                  format: uint32
+                  minimum: 0
+                  nullable: true
+                maxMemoryMib:
+                  type: integer
+                  format: uint64
+                  minimum: 0
+                  nullable: true
+                priority:
+                  type: integer
+                  format: int32
+                  default: 0
+                overcommit:
+                  type: object
+                  default:
+                    enabled: true
+                    minRatio: 1.0
+                    maxRatio: 1.2
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: true
+                    minRatio:
+                      type: number
+                      format: double
+                      default: 1.0
+                    maxRatio:
+                      type: number
+                      format: double
+                      default: 1.2
+            status:
+              type: object
+              nullable: true
+              properties:
+                pendingJobs:
+                  type: integer
+                  format: uint32
+                  default: 0
+                runningJobs:
+                  type: integer
+                  format: uint32
+                  default: 0
+                allocatedMemoryMib:
+                  type: integer
+                  format: uint64
+                  default: 0
+                overcommitRatio:
+                  type: number
+                  format: double
+                  default: 0.0
+                observedAt:
+                  type: string
+                  nullable: true
+                conditions:
+                  type: array
+                  default: []
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                        nullable: true
+                      message:
+                        type: string
+                        nullable: true
+      subresources:
+        status: {}
