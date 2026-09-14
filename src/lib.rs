@@ -15,6 +15,9 @@
 // 系統設定：讀取 ConfigMap，包含 mode、lookahead、overcommit 等設定。
 pub mod config;
 
+// Kubernetes-independent V1 contracts for cluster, job and workload decisions.
+pub mod domain;
+
 // Kubernetes controller 的主控制流程：watch object、reconcile、admission。
 pub mod controller;
 

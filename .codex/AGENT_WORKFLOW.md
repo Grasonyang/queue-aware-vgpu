@@ -18,6 +18,15 @@
 6. Lead 執行完整驗證，確認 acceptance criteria 後才回寫 Linear。
 7. 只有 Lead 更新 Linear status、comment、milestone 或 issue 描述。
 
+## Branch 與 merge 規則
+
+- 一張 Linear issue 對應一個 branch；不得讓兩張票共用 branch，也不得把未拆分的跨票重構混進來。
+- 優先直接使用 Linear issue 的 `gitBranchName`，例如 `GRA-5` 使用 `grasonjas/gra-5-define-v1-domain-contracts-and-lifecycle-invariants`。
+- Branch 一律從 `main` 建立；完成前由該票的主要 Agent 負責，Lead 負責整合與 merge。
+- 不直接在 `main` 開發。需要跨票共用的基礎改動，先回報 Lead 拆成獨立 issue 或調整依賴順序。
+- Merge 前至少要有：issue acceptance criteria、變更檔案清單、必要測試結果、已知限制，以及與 `main` 的 diff 檢查。
+- Merge 後才將 Linear issue 標記完成；若驗證失敗，保留 branch 並回報 blocker，不以部分完成冒充 Done。
+
 ## Agent 選擇
 
 | 工作內容 | 主要 Agent |
