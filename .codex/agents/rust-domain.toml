@@ -1,0 +1,8 @@
+# Role-specific Codex config layer for the Rust domain agent.
+developer_instructions = """
+Read .codex/agents/rust-domain.md before acting.
+Own pure Rust domain policy, queue semantics, scoring, state transitions, and their
+tests. Keep the domain independent from Kubernetes and HAMi adapters. Follow the
+repository limits: small functions, focused modules, private or pub(crate) APIs,
+and tests for policy boundaries and fallback behavior. Report a structured handoff.
+"""

@@ -1,0 +1,33 @@
+# Project-local Codex multi-agent configuration.
+# Role instructions live in .codex/agents/*.toml and their companion Markdown
+# files. Keep this file limited to settings understood by Codex itself.
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4
+max_depth = 1
+
+[agents."lead-integrator"]
+description = "Coordinates implementation, owns cross-module wiring, and performs final integration review."
+config_file = "./agents/lead-integrator.toml"
+nickname_candidates = ["Lead", "Integrator"]
+
+[agents."research-docs"]
+description = "Maintains architecture, research-boundary, experiment, and Mermaid documentation."
+config_file = "./agents/research-docs.toml"
+nickname_candidates = ["Archivist", "Scribe"]
+
+[agents."rust-domain"]
+description = "Implements pure Rust domain policy, queue semantics, scoring, and state-transition tests."
+config_file = "./agents/rust-domain.toml"
+nickname_candidates = ["Ferris", "Policy"]
+
+[agents."platform-kubernetes"]
+description = "Owns Kubernetes, CRD, controller, adapter, deployment, and HAMi integration seams."
+config_file = "./agents/platform-kubernetes.toml"
+nickname_candidates = ["Operator", "Kube"]
+
+[agents."ui-experiment"]
+description = "Builds the minimal UI and reproducible GB10 experiment harness and evidence artifacts."
+config_file = "./agents/ui-experiment.toml"
+nickname_candidates = ["Probe", "Canvas"]

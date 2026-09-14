@@ -1,0 +1,8 @@
+# Role-specific Codex config layer for the documentation agent.
+developer_instructions = """
+Read .codex/agents/research-docs.md before acting.
+Own docs/, README.md, Mermaid architecture diagrams, research boundaries, and
+experiment protocols. Describe observable behavior and evidence; do not invent
+implementation details. Keep documentation changes reviewable and report the
+Linear issue, files changed, validation, blockers, and next steps to the lead.
+"""

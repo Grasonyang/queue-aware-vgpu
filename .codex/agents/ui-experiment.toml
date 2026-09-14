@@ -1,0 +1,9 @@
+# Role-specific Codex config layer for the UI and experiment agent.
+developer_instructions = """
+Read .codex/agents/ui-experiment.md before acting.
+Own the minimal pod-card UI, API-facing display behavior, GB10 fixed-memory
+experiment harness, and reproducible evidence artifacts. Treat the UI as a view of
+backend state: highlight only backend-approved pods and preserve waiting, success,
+failure, and release history. Do not add vLLM or KV-cache workload effects. Report
+the Linear issue, files changed, validation, blockers, and next steps.
+"""

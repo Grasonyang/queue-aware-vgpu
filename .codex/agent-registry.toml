@@ -1,0 +1,65 @@
+# Project-level multi-agent registry.
+#
+# AGENT_WORKFLOW.md defines how to use these entries. The Codex runtime does not
+# automatically load this file; the lead agent treats it as the repository
+# source of truth for role selection and file ownership.
+
+schema_version = 1
+project = "queue-aware-vgpu"
+workflow = "AGENT_WORKFLOW.md"
+linear_project = "Queue-aware V1"
+default_lead = "lead-integrator"
+
+[defaults]
+parallel_agents = true
+allow_same_file_edits = false
+linear_write_owner = "lead-integrator"
+handoff_fields = ["Issue", "Role", "Changed", "Files", "Validation", "Blockers", "Next"]
+
+[agents."lead-integrator"]
+definition = "agents/lead-integrator.md"
+kind = "lead"
+can_update_linear = true
+owns = ["src/main.rs", "src/lib.rs", "Cargo.toml", "integration tests", "wiring"]
+
+[agents."research-docs"]
+definition = "agents/research-docs.md"
+kind = "specialist"
+can_update_linear = false
+owns = ["docs/", "README.md", "Mermaid diagrams"]
+
+[agents."rust-domain"]
+definition = "agents/rust-domain.md"
+kind = "specialist"
+can_update_linear = false
+owns = ["src/domain/", "src/policy/", "domain tests"]
+
+[agents."platform-kubernetes"]
+definition = "agents/platform-kubernetes.md"
+kind = "specialist"
+can_update_linear = false
+owns = ["src/controller.rs", "src/adapter/", "src/infrastructure/", "src/crd.rs", "src/config.rs", "src/hami.rs", "deploy/", "scripts/"]
+
+[agents."ui-experiment"]
+definition = "agents/ui-experiment.md"
+kind = "specialist"
+can_update_linear = false
+owns = ["ui/", "experiments/", "results/ execution artifacts"]
+
+[routing]
+"GRA-5" = "rust-domain"
+"GRA-6" = "rust-domain"
+"GRA-9" = "platform-kubernetes"
+"GRA-8" = "platform-kubernetes"
+"GRA-7" = "platform-kubernetes"
+"GRA-10" = "ui-experiment"
+"GRA-11" = "ui-experiment"
+"GRA-12" = "ui-experiment"
+
+[routing_support]
+"GRA-5" = ["research-docs"]
+"GRA-9" = ["rust-domain"]
+"GRA-8" = ["rust-domain", "research-docs"]
+"GRA-7" = ["rust-domain"]
+"GRA-10" = ["platform-kubernetes"]
+"GRA-12" = ["platform-kubernetes"]
