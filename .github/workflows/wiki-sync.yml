@@ -31,7 +31,7 @@ jobs:
             "https://x-access-token:${WIKI_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" \
             "$RUNNER_TEMP/queue-aware-vgpu-wiki"
 
-      - name: Sync short docs pages
+      - name: Sync architecture docs pages
         run: |
           bash scripts/check-docs.sh
           bash scripts/sync-wiki.sh \

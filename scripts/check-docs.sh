@@ -3,12 +3,18 @@ set -euo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 DOCS_DIR="$ROOT_DIR/docs"
-MAX_LINES=100
+MAX_LINES=220
 failed=false
 
 [[ -d "$DOCS_DIR" ]] || { echo "docs directory is missing" >&2; exit 1; }
 
-for file in "$DOCS_DIR"/*.md; do
+mapfile -d '' markdown_files < <(find "$DOCS_DIR" -type f -name '*.md' -print0 | sort -z)
+if ((${#markdown_files[@]} == 0)); then
+  echo "no Markdown documents found under: $DOCS_DIR" >&2
+  exit 1
+fi
+
+for file in "${markdown_files[@]}"; do
   line_count="$(wc -l < "$file")"
   if (( line_count > MAX_LINES )); then
     echo "too long: $file has $line_count lines (limit $MAX_LINES)" >&2
@@ -28,17 +34,10 @@ for file in "$DOCS_DIR"/*.md; do
 done
 
 required=(
-  "$DOCS_DIR/README.md"
-  "$DOCS_DIR/00-overview.md"
-  "$DOCS_DIR/01-platform.md"
-  "$DOCS_DIR/02-gate-queue-vgpu.md"
-  "$DOCS_DIR/03-controller-loop.md"
-  "$DOCS_DIR/04-modes.md"
-  "$DOCS_DIR/05-code-map.md"
-  "$DOCS_DIR/06-reproduce.md"
-  "$DOCS_DIR/07-experiments.md"
-  "$DOCS_DIR/08-teacher-talk.md"
-  "$DOCS_DIR/09-rust-primer.md"
+  "$DOCS_DIR/arch/v1.md"
+  "$DOCS_DIR/arch/v1-architecture-image.md"
+  "$DOCS_DIR/arch/v1-domain-contracts.md"
+  "$DOCS_DIR/arch/domain/README.md"
 )
 for file in "${required[@]}"; do
   [[ -f "$file" ]] || {

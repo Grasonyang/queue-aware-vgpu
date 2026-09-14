@@ -18,5 +18,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check short pages and diagrams
+      - name: Check docs and diagrams
         run: bash scripts/check-docs.sh

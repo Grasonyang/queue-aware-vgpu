@@ -11,7 +11,7 @@ usage() {
   cat <<'EOF'
 Usage: scripts/sync-wiki.sh --wiki-dir PATH [--source PATH] [--push]
 
-Copies the short, numbered docs pages into an existing GitHub Wiki checkout.
+Copies the repository Markdown architecture pages into an existing GitHub Wiki checkout.
 Unmanaged Wiki pages are preserved.
 
 Options:
@@ -47,31 +47,51 @@ if [[ -f "$managed_manifest" ]]; then
   done < "$managed_manifest"
 fi
 
-managed=("Home.md" "Index.md" "_Sidebar.md")
-cp "$SOURCE_DIR/00-overview.md" "$WIKI_DIR/Home.md"
-cp "$SOURCE_DIR/README.md" "$WIKI_DIR/Index.md"
+managed=("_Sidebar.md")
 
-shopt -s nullglob
-for source in "$SOURCE_DIR"/[0-9][0-9]-*.md; do
-  page="$(basename "$source")"
-  cp "$source" "$WIKI_DIR/$page"
+page_name() {
+  local relative="$1"
+  case "$relative" in
+    arch/v1.md) echo "Home.md" ;;
+    arch/domain/README.md) echo "domain.md" ;;
+    arch/domain/*.md) echo "domain-$(basename "$relative")" ;;
+    *) echo "$(basename "$relative")" ;;
+  esac
+}
+
+rewrite_links() {
+  sed \
+    -e 's#](v1\.md)#](Home)#g' \
+    -e 's#](domain/README\.md)#](domain)#g' \
+    -e 's#](\.\./dev/deep-module-design\.md)#](deep-module-design)#g' \
+    -e 's#](\.\./dev/research-scope-and-boundaries\.md)#](research-scope-and-boundaries)#g'
+}
+
+mapfile -d '' markdown_files < <(find "$SOURCE_DIR" -type f -name '*.md' -print0 | sort -z)
+for source in "${markdown_files[@]}"; do
+  relative="${source#"$SOURCE_DIR/"}"
+  page="$(page_name "$relative")"
+  rewrite_links < "$source" > "$WIKI_DIR/$page"
   managed+=("$page")
 done
-shopt -u nullglob
 
 cat > "$WIKI_DIR/_Sidebar.md" <<'EOF'
 ## Queue-aware vGPU
 
-- [總覽](Home)
-- [平台](01-platform)
-- [Gate / Queue / vGPU](02-gate-queue-vgpu)
-- [Controller loop](03-controller-loop)
-- [四種 mode](04-modes)
-- [Code map](05-code-map)
-- [復現步驟](06-reproduce)
-- [實驗](07-experiments)
-- [明天報告稿](08-teacher-talk)
-- [Rust primer](09-rust-primer)
+- [V1 架構](Home)
+- [V1 架構圖](v1-architecture-image)
+- [V1 Domain contracts](v1-domain-contracts)
+- [Domain 工具地圖](domain)
+- [Identity](domain-ids)
+- [GPU 記憶體](domain-memory)
+- [Cluster 治理](domain-cluster)
+- [租戶 Queue](domain-queue)
+- [Job 需求](domain-job)
+- [排程決策](domain-decision)
+- [Workload lifecycle](domain-lifecycle)
+- [Reservation](domain-reservation)
+- [Deep Module Design](deep-module-design)
+- [研究範圍與邊界](research-scope-and-boundaries)
 EOF
 managed+=(".queue-aware-vgpu-managed-pages")
 printf '%s\n' "${managed[@]}" > "$managed_manifest"
