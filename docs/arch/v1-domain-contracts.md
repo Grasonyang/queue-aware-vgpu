@@ -173,4 +173,3 @@ smoke test，也不宣稱目前 prototype 已通過。
 - DQA 歷史訊號、信用公式、動態 quota 調整規則。
 - HAMi annotation、device-plugin 表示法與固定記憶體 workload 的實機證據格式。
 - 是否需要以既有 Kubernetes status 保存 weighted-round-robin progress；不得新增第二個 persistent state store，除非另有研究設計依據。
-

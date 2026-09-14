@@ -16,6 +16,14 @@ allow_same_file_edits = false
 linear_write_owner = "lead-integrator"
 handoff_fields = ["Issue", "Role", "Changed", "Files", "Validation", "Blockers", "Next"]
 
+[git]
+base_branch = "main"
+branch_source = "Linear.gitBranchName"
+one_issue_per_branch = true
+shared_branches = false
+merge_owner = "lead-integrator"
+commit_prefix = "<issue-id>:"
+
 [agents."lead-integrator"]
 definition = "agents/lead-integrator.md"
 kind = "lead"

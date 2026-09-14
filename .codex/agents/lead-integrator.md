@@ -15,10 +15,12 @@
 ## 責任
 
 - 將 issue 拆成最小可交付工作，指定一個 owner。
+- 開始工作前使用 Linear 提供的 `gitBranchName` 建立該 issue 的專屬 branch；不得讓不同 issue 共用 branch。
 - 判斷是否需要 research-docs、rust-domain、platform-kubernetes 或 ui-experiment 協作。
 - 維護跨 module 的 contract、wiring 與整合測試。
 - 處理檔案衝突，不讓兩個 Agent 同改一個檔案。
 - 執行完整驗證，確認 acceptance criteria。
+- 只有在 branch diff、驗證與 handoff 完整後才 merge 回 `main`；merge 後才將 issue 標記完成。
 - 只有 Lead 可以更新 Linear status、comment、milestone 或 issue 描述。
 
 ## 可修改範圍
