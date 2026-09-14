@@ -36,7 +36,7 @@ action intent 轉成外部動作。
 
 | 概念 | 必須保留的語意 |
 | --- | --- |
-| `TenantId` / `QueueId` | 租戶與租戶 queue 的 identity；不能用 display name 的偶然排序取代 identity。 |
+| `TenantQueueId` | 將租戶與其 queue 綁定成單一 identity；不能讓 Job 持有未關聯的 tenant／queue 組合。 |
 | workload identity | 一次 `DesiredGpuPod` 嘗試的穩定 identity；reconcile 不產生新 identity。 |
 | `MemoryAmount` | 明確攜帶單位；GB 與 GiB 不可隱式互換。96 GB 是可設定的實驗預算，不是物理切割保證。 |
 | `WaitPolicy` | `Forever` 或帶固定 deadline 的限時等待；deadline 起點是正式接受時間。 |

@@ -1,9 +1,9 @@
 use chrono::{Duration, TimeZone, Utc};
 use queue_aware_vgpu_controller::domain::{
     AdmissionError, ClusterSnapshot, FailureReason, GpuMemoryMib, JobDecision, JobSpec,
-    LifecycleError, QueueError, RejectReason, ReleaseState, ReservationError, ReservationId,
-    ReservationLedger, ReservationStatus, TenantBudget, TenantId, TenantQueue, WaitMode,
-    WaitReason, WaitingPhase, WorkloadId, WorkloadState,
+    LifecycleError, QueueError, QueueId, RejectReason, ReleaseState, ReservationError,
+    ReservationId, ReservationLedger, ReservationStatus, TenantBudget, TenantId, TenantQueue,
+    TenantQueueId, WaitMode, WaitReason, WaitingPhase, WorkloadId, WorkloadState,
 };
 
 fn timestamp() -> chrono::DateTime<Utc> {
@@ -16,6 +16,10 @@ fn id(value: &str) -> WorkloadId {
 
 fn tenant(value: &str) -> TenantId {
     TenantId::new(value).unwrap()
+}
+
+fn tenant_queue(tenant_name: &str, queue_name: &str) -> TenantQueueId {
+    TenantQueueId::new(tenant(tenant_name), QueueId::new(queue_name).unwrap())
 }
 
 fn reservation(value: &str) -> ReservationId {
@@ -42,12 +46,23 @@ fn cluster(total: u64, reserved: u64) -> ClusterSnapshot {
 fn job(value: &str, memory: u64, mode: WaitMode) -> JobSpec {
     JobSpec::new(
         id(value),
-        tenant("tenant-a"),
-        queue_aware_vgpu_controller::domain::QueueId::new("queue-a").unwrap(),
+        tenant_queue("tenant-a", "queue-a"),
         GpuMemoryMib::new(memory),
         mode,
     )
     .unwrap()
+}
+
+#[test]
+fn tenant_queue_identity_keeps_owner_and_queue_together() {
+    let identity = tenant_queue("tenant-a", "queue-a");
+    assert_eq!(identity.tenant(), &tenant("tenant-a"));
+    assert_eq!(identity.queue(), &QueueId::new("queue-a").unwrap());
+
+    let job = job("bound", 8, WaitMode::Forever);
+    assert_eq!(job.tenant_queue(), &identity);
+    assert_eq!(job.tenant(), identity.tenant());
+    assert_eq!(job.queue(), identity.queue());
 }
 
 #[test]
@@ -120,7 +135,7 @@ fn job_decision_places_one_reservation_intent_when_feasible() {
 
 #[test]
 fn tenant_queue_is_strict_fifo() {
-    let mut queue = TenantQueue::new(tenant("tenant-a"));
+    let mut queue = TenantQueue::new(tenant_queue("tenant-a", "queue-a"));
     let first = job("first", 8, WaitMode::Forever);
     let second = job("second", 8, WaitMode::Forever);
     queue.enqueue(&first).unwrap();
@@ -129,6 +144,19 @@ fn tenant_queue_is_strict_fifo() {
     assert_eq!(queue.pop_head(second.id()), Err(QueueError::NotQueueHead));
     queue.pop_head(first.id()).unwrap();
     assert_eq!(queue.head(), Some(second.id()));
+}
+
+#[test]
+fn tenant_queue_rejects_a_job_from_another_queue() {
+    let mut queue = TenantQueue::new(tenant_queue("tenant-a", "queue-a"));
+    let other = JobSpec::new(
+        id("other-queue"),
+        tenant_queue("tenant-a", "queue-b"),
+        GpuMemoryMib::new(8),
+        WaitMode::Forever,
+    )
+    .unwrap();
+    assert_eq!(queue.enqueue(&other), Err(QueueError::QueueMismatch));
 }
 
 #[test]

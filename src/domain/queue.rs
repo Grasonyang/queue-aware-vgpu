@@ -1,30 +1,30 @@
-use super::{JobSpec, TenantId, WorkloadId};
+use super::{JobSpec, TenantQueueId, WorkloadId};
 use std::collections::VecDeque;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum QueueError {
-    TenantMismatch,
+    QueueMismatch,
     DuplicateWorkload,
     NotQueueHead,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TenantQueue {
-    tenant: TenantId,
+    identity: TenantQueueId,
     entries: VecDeque<WorkloadId>,
 }
 
 impl TenantQueue {
-    pub fn new(tenant: TenantId) -> Self {
+    pub fn new(identity: TenantQueueId) -> Self {
         Self {
-            tenant,
+            identity,
             entries: VecDeque::new(),
         }
     }
 
     pub fn enqueue(&mut self, job: &JobSpec) -> Result<(), QueueError> {
-        if job.tenant() != &self.tenant {
-            return Err(QueueError::TenantMismatch);
+        if job.tenant_queue() != &self.identity {
+            return Err(QueueError::QueueMismatch);
         }
         if self.entries.iter().any(|id| id == job.id()) {
             return Err(QueueError::DuplicateWorkload);
