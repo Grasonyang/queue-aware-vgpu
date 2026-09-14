@@ -13,7 +13,7 @@ mod reservation;
 mod reservation_types;
 
 pub use cluster::{ClusterSnapshot, TenantBudget};
-pub use ids::{DomainIdError, QueueId, ReservationId, TenantId, WorkloadId};
+pub use ids::{DomainIdError, QueueId, ReservationId, TenantId, TenantQueueId, WorkloadId};
 pub use job::{AdmissionError, JobSpec};
 pub use job_decision::{JobDecision, RejectReason, ReservationIntent, WaitReason};
 pub use lifecycle::WorkloadLifecycle;

@@ -1,12 +1,11 @@
-use super::{ClusterSnapshot, GpuMemoryMib, QueueId, TenantId, WorkloadId};
+use super::{ClusterSnapshot, GpuMemoryMib, QueueId, TenantId, TenantQueueId, WorkloadId};
 use super::{WaitMode, WorkloadLifecycle};
 use chrono::{DateTime, Utc};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct JobSpec {
     id: WorkloadId,
-    tenant: TenantId,
-    queue: QueueId,
+    tenant_queue: TenantQueueId,
     requested_memory: GpuMemoryMib,
     wait_mode: WaitMode,
 }
@@ -14,8 +13,7 @@ pub struct JobSpec {
 impl JobSpec {
     pub fn new(
         id: WorkloadId,
-        tenant: TenantId,
-        queue: QueueId,
+        tenant_queue: TenantQueueId,
         requested_memory: GpuMemoryMib,
         wait_mode: WaitMode,
     ) -> Result<Self, QueueError> {
@@ -24,8 +22,7 @@ impl JobSpec {
         }
         Ok(Self {
             id,
-            tenant,
-            queue,
+            tenant_queue,
             requested_memory,
             wait_mode,
         })
@@ -36,11 +33,15 @@ impl JobSpec {
     }
 
     pub fn tenant(&self) -> &TenantId {
-        &self.tenant
+        self.tenant_queue.tenant()
     }
 
     pub fn queue(&self) -> &QueueId {
-        &self.queue
+        self.tenant_queue.queue()
+    }
+
+    pub fn tenant_queue(&self) -> &TenantQueueId {
+        &self.tenant_queue
     }
 
     pub const fn requested_memory(&self) -> GpuMemoryMib {
