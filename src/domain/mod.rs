@@ -3,6 +3,7 @@
 mod cluster;
 mod ids;
 mod job;
+mod job_decision;
 mod lifecycle;
 mod lifecycle_release;
 mod lifecycle_types;
@@ -14,6 +15,7 @@ mod reservation_types;
 pub use cluster::{ClusterSnapshot, TenantBudget};
 pub use ids::{DomainIdError, QueueId, ReservationId, TenantId, WorkloadId};
 pub use job::{AdmissionError, JobSpec};
+pub use job_decision::{JobDecision, RejectReason, ReservationIntent, WaitReason};
 pub use lifecycle::WorkloadLifecycle;
 pub use lifecycle_types::{
     FailureReason, LifecycleError, ReleasePermit, ReleaseState, WaitMode, WaitingPhase,

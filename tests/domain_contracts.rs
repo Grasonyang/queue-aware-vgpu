@@ -1,8 +1,9 @@
 use chrono::{Duration, TimeZone, Utc};
 use queue_aware_vgpu_controller::domain::{
-    AdmissionError, ClusterSnapshot, FailureReason, GpuMemoryMib, JobSpec, LifecycleError,
-    QueueError, ReleaseState, ReservationError, ReservationId, ReservationLedger,
-    ReservationStatus, TenantId, TenantQueue, WaitMode, WaitingPhase, WorkloadId, WorkloadState,
+    AdmissionError, ClusterSnapshot, FailureReason, GpuMemoryMib, JobDecision, JobSpec,
+    LifecycleError, QueueError, RejectReason, ReleaseState, ReservationError, ReservationId,
+    ReservationLedger, ReservationStatus, TenantBudget, TenantId, TenantQueue, WaitMode,
+    WaitReason, WaitingPhase, WorkloadId, WorkloadState,
 };
 
 fn timestamp() -> chrono::DateTime<Utc> {
@@ -24,6 +25,18 @@ fn reservation(value: &str) -> ReservationId {
 fn accepted(job: JobSpec) -> queue_aware_vgpu_controller::domain::WorkloadLifecycle {
     let cluster = ClusterSnapshot::new(GpuMemoryMib::new(96), GpuMemoryMib::zero());
     job.accept_within(cluster, timestamp()).unwrap()
+}
+
+fn budget(limit: u64, reserved: u64) -> TenantBudget {
+    TenantBudget::new(
+        tenant("tenant-a"),
+        GpuMemoryMib::new(limit),
+        GpuMemoryMib::new(reserved),
+    )
+}
+
+fn cluster(total: u64, reserved: u64) -> ClusterSnapshot {
+    ClusterSnapshot::new(GpuMemoryMib::new(total), GpuMemoryMib::new(reserved))
 }
 
 fn job(value: &str, memory: u64, mode: WaitMode) -> JobSpec {
@@ -55,6 +68,54 @@ fn request_that_waits_for_current_capacity_is_accepted() {
         &WorkloadState::Waiting(WaitingPhase::Queued)
     );
     assert_eq!(cluster.available_memory(), GpuMemoryMib::new(16));
+}
+
+#[test]
+fn job_decision_rejects_over_total_budget() {
+    let decision = job("too-large", 97, WaitMode::Forever).evaluate(
+        cluster(96, 0),
+        &budget(96, 0),
+        true,
+        reservation("r-reject"),
+    );
+    assert_eq!(
+        decision,
+        JobDecision::Reject {
+            reason: RejectReason::ExceedsTotalBudget
+        }
+    );
+}
+
+#[test]
+fn job_decision_waits_with_typed_reason() {
+    let decision = job("not-head", 24, WaitMode::Forever).evaluate(
+        cluster(96, 0),
+        &budget(96, 0),
+        false,
+        reservation("r-wait"),
+    );
+    assert_eq!(
+        decision,
+        JobDecision::Wait {
+            reason: WaitReason::NotQueueHead
+        }
+    );
+}
+
+#[test]
+fn job_decision_places_one_reservation_intent_when_feasible() {
+    let decision = job("place", 24, WaitMode::Forever).evaluate(
+        cluster(96, 0),
+        &budget(48, 0),
+        true,
+        reservation("r-place"),
+    );
+    let JobDecision::Place { intent } = decision else {
+        panic!("expected place decision");
+    };
+    assert_eq!(intent.workload(), &id("place"));
+    assert_eq!(intent.reservation(), &reservation("r-place"));
+    assert_eq!(intent.amount(), GpuMemoryMib::new(24));
 }
 
 #[test]
